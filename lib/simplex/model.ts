@@ -64,17 +64,10 @@ export function setCell(t: Tableau, rowIndex: number, colIndex: number, next: st
     return { ...t, cells };
 }
 
-function parseNumberLoose(s: string): number {
-    const trimmed = s.trim();
-    if (trimmed === "" || trimmed === "-" || trimmed === "." || trimmed === "-.") return 0;
-    const n = Number(trimmed);
-    return Number.isFinite(n) ? n : 0;
-}
-
 export function freezeTableau(t: Tableau): FrozenTableau {
     const colVars = t.colVars.map((v, i) => clampNonEmptyLabel(v, `x${i + 1}`));
     const rowVars = t.rowVars.map((v, i) => clampNonEmptyLabel(v, `r${i + 1}`));
-    const values = t.cells.map((row) => row.map(parseNumberLoose));
+    const values = t.cells.map((row) => row.map(x => (x || "").trim()));
     return { colVars, rowVars, values };
 }
 

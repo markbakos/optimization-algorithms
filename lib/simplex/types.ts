@@ -9,7 +9,7 @@ export type Tableau = {
 export type FrozenTableau = {
     colVars: string[];
     rowVars: string[];
-    values: number[][];
+    values: string[][];
 };
 
 export type WorkbenchState = {

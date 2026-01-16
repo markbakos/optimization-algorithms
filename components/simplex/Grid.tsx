@@ -19,9 +19,14 @@ type Props = {
     onRemoveRow?: (rowIndex: number) => void;
 };
 
-function isNumericDraft(value: string): boolean {
-    if (value.trim() === "" || value === "-" || value === "." || value === "-.") return true;
-    return /^-?\d*(\.\d*)?$/.test(value);
+function isValid(value: string): boolean {
+    const v = value.trim();
+    if (v === "" || v === "-" || v === "." || v === "-." || v === "/" || v === "-/") return true;
+
+    const decimalDraft = /^-?(?:\d+\.?\d*|\.\d*)$/.test(v);
+    const fractionDraft = /^-?(?:\d+)?\s*\/\s*(?:\d+)?$/.test(v);
+
+    return decimalDraft || fractionDraft;
 }
 
 export const Grid = memo(function TableauGrid({
@@ -111,7 +116,7 @@ export const Grid = memo(function TableauGrid({
                                         onChange={(e) => {
                                             if (isView) return;
                                             const next = e.target.value;
-                                            if (!isNumericDraft(next)) return;
+                                            if (!isValid(next)) return;
                                             onSetCell?.(r, c, next);
                                         }}
                                         placeholder="0"
