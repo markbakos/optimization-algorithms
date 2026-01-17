@@ -25,14 +25,14 @@ export const History = memo(function History({ items, selectedStep, onSelect }: 
 
             <div className="rounded-2xl border border-neutral-200 bg-white p-3">
                 <div className="flex gap-3 overflow-x-auto pb-2">
-                    {items.map((it) => {
-                        const isSelected = it.step === selectedStep;
+                    {[...items].reverse().map((x) => {
+                        const isSelected = x.step === selectedStep;
 
                         return (
                             <button
-                                key={it.id}
+                                key={x.id}
                                 type="button"
-                                onClick={() => onSelect(it.step)}
+                                onClick={() => onSelect(x.step)}
                                 className={[
                                     "shrink-0 text-left rounded-2xl border shadow-sm transition",
                                     "bg-neutral-50 hover:bg-neutral-100",
@@ -42,15 +42,15 @@ export const History = memo(function History({ items, selectedStep, onSelect }: 
                                 style={{ width: 260 }}
                             >
                                 <div className="flex items-center justify-between px-3 py-2">
-                                    <div className="text-xs font-semibold text-neutral-800">Step {it.step}</div>
+                                    <div className="text-xs font-semibold text-neutral-800">Step {x.step}</div>
                                     <div className="text-[11px] text-neutral-500">
-                                        {it.rowVars.length}×{it.colVars.length}
+                                        {x.rowVars.length}×{x.colVars.length}
                                     </div>
                                 </div>
 
                                 <div className="h-40 overflow-hidden px-2 pb-2">
                                     <div className="origin-top-left scale-[0.7]">
-                                        <Grid tableau={displayToTableau(it)} mode="view" initial={false} />
+                                        <Grid tableau={displayToTableau(x)} mode="view" initial={false} />
                                     </div>
                                 </div>
                             </button>
