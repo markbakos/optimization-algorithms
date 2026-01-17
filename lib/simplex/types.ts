@@ -7,13 +7,15 @@ export type Tableau = {
 };
 
 export type FrozenTableau = {
+    id: string;
+    step: number;
     colVars: string[];
     rowVars: string[];
-    values: string[][];
+    cells: string[][];
 };
 
 export type WorkbenchState = {
-    previous: FrozenTableau | null;
+    previousStep: number | null;
     current: Tableau;
     history: FrozenTableau[];
 };

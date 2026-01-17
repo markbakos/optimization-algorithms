@@ -64,18 +64,24 @@ export function setCell(t: Tableau, rowIndex: number, colIndex: number, next: st
     return { ...t, cells };
 }
 
-export function freezeTableau(t: Tableau): FrozenTableau {
+export function freezeTableau(t: Tableau, step: number): FrozenTableau {
     const colVars = t.colVars.map((v, i) => clampNonEmptyLabel(v, `x${i + 1}`));
     const rowVars = t.rowVars.map((v, i) => clampNonEmptyLabel(v, `r${i + 1}`));
-    const values = t.cells.map((row) => row.map(x => (x || "").trim()));
-    return { colVars, rowVars, values };
+    const cells = t.cells.map((row) => row.map(x => (x || "").trim()));
+    return {
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        step,
+        colVars,
+        rowVars,
+        cells
+    };
 }
 
 export function createFromFrozen(f: FrozenTableau): Tableau {
     return {
         colVars: [...f.colVars],
         rowVars: [...f.rowVars],
-        cells: f.values.map((row) => row.map((n) => String(n))),
+        cells: f.cells.map((row) => row.map((n) => String(n))),
     };
 }
 
@@ -85,4 +91,8 @@ export function createNextEmptyLikeFrozen(f: FrozenTableau): Tableau {
         rowVars: [...f.rowVars],
         cells: f.rowVars.map(() => Array.from({ length: f.colVars.length }, () => "")),
     };
+}
+
+export function displayToTableau(f: FrozenTableau): Tableau {
+    return { colVars: f.colVars, rowVars: f.rowVars, cells: f.cells };
 }
