@@ -178,6 +178,9 @@ export function Workbench() {
                                 onRemoveRow={(r) =>
                                     setState((s) => ({ ...s, current: removeRow(s.current, r) }))
                                 }
+                                onSetPivot={(p) =>
+                                    setState((s) => ({ ...s, current: { ...s.current, pivot: p } }))
+                                }
                             />
                         </div>
                     </CardContent>
@@ -187,7 +190,7 @@ export function Workbench() {
             <History
                 items={state.history}
                 selectedStep={selectedPrev?.step || null}
-                onSelect={(step) => setState((s) => ({...s, previous: step}))}
+                onSelect={(step) => setState((s) => ({...s, previousStep: step}))}
             />
         </div>
     );

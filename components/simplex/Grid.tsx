@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo } from "react";
-import type { Tableau } from "@/lib/simplex/types";
+import type { Tableau, Pivot } from "@/lib/simplex/types";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -17,6 +17,8 @@ type Props = {
     onSetCell?: (rowIndex: number, colIndex: number, next: string) => void;
     onRemoveCol?: (colIndex: number) => void;
     onRemoveRow?: (rowIndex: number) => void;
+
+    onSetPivot?: (pivot: Pivot) => void;
 };
 
 function isValid(value: string): boolean {
@@ -38,9 +40,22 @@ export const Grid = memo(function TableauGrid({
                                                          onSetCell,
                                                          onRemoveCol,
                                                          onRemoveRow,
+                                                         onSetPivot,
                                                      }: Props) {
     const isView = mode === "view";
-    const { colVars, rowVars, cells } = tableau;
+    const { colVars, rowVars, cells, pivot } = tableau;
+
+    const HandlePivot = (r: number, c: number) => {
+        if (isView) return;
+
+        const next: Pivot = pivot && pivot.row === r && pivot.col === c ? null : { row: r, col: c };
+
+        onSetPivot?.(next);
+    }
+
+    function isPivotCell(pivot: Pivot | undefined, r: number, c: number): boolean {
+        return !!pivot && pivot.row === r && pivot.col === c;
+    }
 
     return (
         <div className="overflow-x-auto">
@@ -108,8 +123,19 @@ export const Grid = memo(function TableauGrid({
 
                         {cells[r].map((cell, c) => {
                             const value = cell || "";
+                            const selected = isPivotCell(pivot, r, c);
                             return (
-                                <td key={c} className="p-2">
+                            <td key={c} className="p-2">
+                                <div
+                                    onDoubleClick={() => HandlePivot(r, c)}
+                                    className={[
+                                        "rounded-lg",
+                                        !isView ? "cursor-cell" : "cursor-default",
+                                        !isView ? "hover:ring-2 hover:ring-neutral-200" : "",
+                                        selected ? "ring-2 ring-amber-400" : "",
+                                    ].join(" ")}
+                                    title={!isView ? "Double-click to set pivot" : undefined}
+                                >
                                     <Input
                                         inputMode="decimal"
                                         value={value}
@@ -120,10 +146,14 @@ export const Grid = memo(function TableauGrid({
                                             onSetCell?.(r, c, next);
                                         }}
                                         placeholder="0"
-                                        className="h-9 w-28 text-right tabular-nums"
+                                        className={[
+                                            "h-9 w-28 text-right tabular-nums",
+                                            selected ? "border-amber-400 focus:ring-amber-200" : "",
+                                        ].join(" ")}
                                         disabled={isView}
                                     />
-                                </td>
+                                </div>
+                            </td>
                             );
                         })}
                     </tr>
