@@ -1,4 +1,4 @@
-import type { FrozenTableau, Tableau } from "./types";
+import type { FrozenTableau, Tableau, Pivot } from "./types";
 
 const DEFAULT_COLS = ["x1", "x2", "b"];
 const DEFAULT_ROWS = ["z", "c1", "c2"];
@@ -64,6 +64,14 @@ export function setCell(t: Tableau, rowIndex: number, colIndex: number, next: st
     return { ...t, cells };
 }
 
+export function setPivot(t: Tableau, pivot: Pivot): Tableau {
+    return { ...t, pivot };
+}
+
+export function clearPivot(t: Tableau): Tableau {
+    return { ...t, pivot: null };
+}
+
 export function freezeTableau(t: Tableau, step: number): FrozenTableau {
     const colVars = t.colVars.map((v, i) => clampNonEmptyLabel(v, `x${i + 1}`));
     const rowVars = t.rowVars.map((v, i) => clampNonEmptyLabel(v, `r${i + 1}`));
@@ -73,7 +81,8 @@ export function freezeTableau(t: Tableau, step: number): FrozenTableau {
         step,
         colVars,
         rowVars,
-        cells
+        cells,
+        pivot: t.pivot || null,
     };
 }
 
@@ -82,6 +91,7 @@ export function createFromFrozen(f: FrozenTableau): Tableau {
         colVars: [...f.colVars],
         rowVars: [...f.rowVars],
         cells: f.cells.map((row) => row.map((n) => String(n))),
+        pivot: f.pivot,
     };
 }
 
@@ -90,9 +100,10 @@ export function createNextEmptyLikeFrozen(f: FrozenTableau): Tableau {
         colVars: [...f.colVars],
         rowVars: [...f.rowVars],
         cells: f.rowVars.map(() => Array.from({ length: f.colVars.length }, () => "")),
+        pivot: null,
     };
 }
 
 export function displayToTableau(f: FrozenTableau): Tableau {
-    return { colVars: f.colVars, rowVars: f.rowVars, cells: f.cells };
+    return { colVars: f.colVars, rowVars: f.rowVars, cells: f.cells, pivot: f.pivot };
 }

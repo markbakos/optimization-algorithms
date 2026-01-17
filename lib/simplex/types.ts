@@ -4,7 +4,13 @@ export type Tableau = {
     colVars: string[];
     rowVars: string[];
     cells: TableauCell[][];
+    pivot?: Pivot;
 };
+
+export type Pivot = {
+    row: number;
+    col: number;
+} | null;
 
 export type FrozenTableau = {
     id: string;
@@ -12,6 +18,7 @@ export type FrozenTableau = {
     colVars: string[];
     rowVars: string[];
     cells: string[][];
+    pivot: {row: number; col: number} | null;
 };
 
 export type WorkbenchState = {
