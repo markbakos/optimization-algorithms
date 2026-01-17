@@ -19,10 +19,11 @@ import { Previous } from "./Previous";
 import { Button } from "../ui/Button";
 import { Card, CardContent, CardHeader } from "../ui/Card";
 import { Input } from "../ui/Input";
+import {History} from "@/components/simplex/History";
 
 function buildInitial(): WorkbenchState {
     return {
-        previous: null,
+        previousStep: null,
         current: createInitialTableau(),
         history: [],
     };
@@ -42,23 +43,29 @@ export function Workbench() {
         [state.current.rowVars.length]
     );
 
+    const selectedPrev = useMemo(() => {
+       if (state.history.length === 0) return null;
+
+       const step = state.previousStep || state.history[state.history.length - 1].step;
+       return state.history.find((h) => h.step === step) || state.history[state.history.length - 1];
+    }, [state.history, state.previousStep]);
+
     const HandleNext = () => {
         setState((s) => {
-            const frozen = freezeTableau(s.current);
+            const step = s.history.length + 1;
+            const frozen = freezeTableau(s.current, step);
             const next: Tableau = createNextEmptyLikeFrozen(frozen);
 
             return {
-                previous: frozen,
                 current: next,
                 history: [...s.history, frozen],
+                previousStep: frozen.step,
             };
         });
         console.log(state)
     };
 
     const resetAll = () => setState(buildInitial());
-
-    const prev = state.previous;
 
     return (
         <div className="mx-auto w-full max-w-7xl px-4 py-8">
@@ -72,8 +79,8 @@ export function Workbench() {
 
             <div className="grid gap-4 lg:grid-cols-[1fr_1.35fr]">
                 <div className="lg:sticky lg:top-6 lg:self-start">
-                    {prev ? (
-                        <Previous frozen={prev} />
+                    {selectedPrev ? (
+                        <Previous frozen={selectedPrev} />
                     ) : (
                         <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-5 text-sm text-neutral-600">
                             No previous tableau yet.
@@ -176,6 +183,12 @@ export function Workbench() {
                     </CardContent>
                 </Card>
             </div>
+
+            <History
+                items={state.history}
+                selectedStep={selectedPrev?.step || null}
+                onSelect={(step) => setState((s) => ({...s, previous: step}))}
+            />
         </div>
     );
 }
